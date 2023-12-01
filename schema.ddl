@@ -125,21 +125,19 @@ CREATE TABLE NewManagers (
 );
 
 
-
+-- These are the segments associated to each session. 
+-- NOTE: session_id is NOT NULL to ensure a segment is associated to EXACTLY one session.
 CREATE TABLE Segment (
     segment_id INT IDENTITY(1,1) PRIMARY KEY,
-    session_id INT,
+    session_id INT NOT NULL,
     length positiveInt,
     format VARCHAR(80),
     FOREIGN KEY (session_id) REFERENCES Sessions(session_id)
 );
 
-CREATE TABLE Track (
-    track_id INT IDENTITY(1,1) PRIMARY KEY,
-    name VARCHAR(80)
-);
 
-CREATE TABLE TrackSegment (
+-- Creates a relationship between tracks and recording segments.
+CREATE TABLE TrackSegmentRelation (
     track_id INT,
     segment_id INT, 
     FOREIGN KEY (track_id) REFERENCES Track(track_id),
@@ -147,6 +145,20 @@ CREATE TABLE TrackSegment (
     PRIMARY KEY(track_id, segment_id)
 );
 
+
+-- Holds information about a track.
+-- NOTE: In this implementation, we will NOT uphold the constraint "a track MUST
+appear in at least one album". This is to avoid awkward circular FK as per @748.
+This also makes sense in real life since some tracks are released as a single,
+with the option to add that single to an album later on.
+CREATE TABLE Track (
+    track_id INT IDENTITY(1,1) PRIMARY KEY,
+    name VARCHAR(80)
+);
+
+-- Holds information about the album.
+-- NOTE: We must specify two preexisting DISTINCT tracks that must be added to the album
+we just created.
 CREATE TABLE Album (
     album_id INT IDENTITY(1,1) PRIMARY KEY,
     name VARCHAR(80),
@@ -158,7 +170,9 @@ CREATE TABLE Album (
     CONSTRAINT CheckDistinctTracks CHECK (og_track1 <> og_track2)
 );
 
-CREATE TABLE TrackAlbum (
+
+-- This holds any additional tracks we want to add to an album.
+CREATE TABLE TrackAlbumRelation (
     album_id INT,
     track_id INT,
     PRIMARY KEY (album_id, track_id),
@@ -168,7 +182,7 @@ CREATE TABLE TrackAlbum (
 
 
 
--- Domains, triggers and extra material
+-- Domains
 
 CREATE DOMAIN positiveFloat AS real
     DEFAULT NULL
