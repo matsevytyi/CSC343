@@ -1,12 +1,29 @@
 -- I think to avoid using triggers as per @664 & @742, it is best if we stick
 with og_manager_id. Then, if we want to hire a new manager for a studio, it is
-enough that we add them to NewManagers table.
+enough that we add them to ManagersHistory table.
 CREATE TABLE Studios (
     studio_id BIGINT IDENTITY(1,1) PRIMARY KEY,
     studio_name VARCHAR(255),
     address VARCHAR(255),
     og_manager_id INT,
-    FOREIGN KEY (og_manager_id) REFERENCES Manages(manager_id) 
+    FOREIGN KEY (og_manager_id) REFERENCES Person(person_id)
+);
+
+
+-- Holds any additonal managers for a studio. 
+-- NOTE: The the employment_start_date in the primary key ensures that an manager can be rehired to be a manager
+again at a later time. We assume that for some studio A, the start_date of any
+new managers is AFTER the start date of studio A's og_manager (that is defined
+in Studio), which we do not need to define.
+-- Since the manager_id is not unique, we allow a manager to manage multiple
+studios at the same time,
+CREATE TABLE ManagersHistory (
+    manager_id INT NOT NULL,
+    studio_id BIGINT NOT NULL,
+    employment_start_date DATE DEFAULT CURRENT_DATE,
+    FOREIGN KEY (managerID) REFERENCES Person(person_id),
+    FOREIGN KEY (studio_id) REFERENCES Studios(studio_id),
+    PRIMARY KEY (studio_id, manager_id, employment_start_date),
 );
 
 
@@ -69,7 +86,7 @@ CREATE TABLE ExtraEngineersPerSession (
 -- This relation is valid since the primary key is eng_id, certificate_id. No
 redundancy there.
 CREATE TABLE CertificatedEngineers (
-    engineer_id INT,
+    engineer_id INT NOT NULL,
     certificate_id INT NOT NULL,
     FOREIGN KEY (engineer_id) REFERENCES Person(person_id),
     PRIMARY KEY(engineer_id, certificate_id)
@@ -108,20 +125,6 @@ CREATE TABLE Band (
     member_id NOT NULL INT,
     FOREIGN KEY (member_id) REFERENCES Person(person_id),
     PRIMARY KEY(band_id, member_id)
-);
-
--- Holds any additonal managers for a studio. 
--- NOTE: The primary key ensures that an manager can be rehired to be a manager
-again at a later time. We assume that for some studio A, the start_date of any
-new managers is AFTER the start date of studio A's og_manager (that is defined
-in Studio), which we do not need to define.
-CREATE TABLE NewManagers (
-    manager_id INT,
-    studio_id BIGINT,
-    employment_start_date DATE DEFAULT CURRENT_DATE,
-    FOREIGN KEY (managerID) REFERENCES Person(person_id),
-    FOREIGN KEY (studio_id) REFERENCES Studios(studio_id),
-    PRIMARY KEY (studio_id, manager_id, employment_start_date),
 );
 
 
@@ -163,12 +166,13 @@ CREATE TABLE Album (
     album_id INT IDENTITY(1,1) PRIMARY KEY,
     name VARCHAR(80),
     release_date DATE,
-    og_track1 INT,
-    og_track2 INT,
+    og_track1 INT NOT NULL,
+    og_track2 INT NOT NULL,
     FOREIGN KEY (og_track1) REFERENCES Track(track_id),
     FOREIGN KEY (og_track2) REFERENCES Track(track_id),
     CONSTRAINT CheckDistinctTracks CHECK (og_track1 <> og_track2)
 );
+
 
 
 -- This holds any additional tracks we want to add to an album.
@@ -178,6 +182,7 @@ CREATE TABLE TrackAlbumRelation (
     PRIMARY KEY (album_id, track_id),
     FOREIGN KEY (album_id) REFERENCES Album(album_id),
     FOREIGN KEY (track_id) REFERENCES Track(track_id)
+
 );
 
 
