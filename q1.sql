@@ -31,10 +31,10 @@ WHERE rnk = 1
 DROP VIEW IF EXISTS StudioSegments CASCADE;
 
 CREATE VIEW StudioSegments AS
-SELECT segment_id, studio_id
-FROM
-Segment NATURAL JOIN MySessions
-;
+SELECT s.segment_id, s2.studio_id
+FROM Segment s
+JOIN Sessions s2
+ON s.session_id = s2.session_id;
 
 --all recording tracks of each studio
 DROP VIEW IF EXISTS StudioTracks CASCADE;
