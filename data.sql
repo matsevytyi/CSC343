@@ -59,11 +59,11 @@ VALUES
   (1, '2023-01-10 13:00', '2023-01-11 14:00', 1500, 5678, 6754),
   (1, '2023-01-12 18:00', '2023-01-13 20:00', 1500, 5678, 6754);
 
-INSERT INTO Sessions (session_id, engineer_id, session_engineer_pos)
+INSERT INTO ExtraEngineersPerSession (session_id, engineer_id, session_engineer_pos)
 VALUES
-  (1, 9942, 1),
-  (2, 9942, 1),
-  (3, 9942, 1);
+  (1, 9942, 2),
+  (2, 9942, 2),
+  (3, 9942, 2);
 
 -- Second set of sessions
 INSERT INTO Sessions (studio_id, start_datetime, end_datetime, fee, engineer_id, booker_id)
