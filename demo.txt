@@ -22,7 +22,7 @@ DROP DOMAIN
 CREATE DOMAIN
 psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:35: NOTICE:  drop cascades to 10 other objects
 DETAIL:  drop cascades to constraint band_frontman_id_fkey on table band
-drop cascades to constraint bandmembership_member_id_fkey on table bandmembership   
+drop cascades to constraint bandmembership_member_id_fkey on table bandmembership
 drop cascades to constraint engineer_engineer_id_fkey on table engineer
 drop cascades to constraint studios_og_manager_id_fkey on table studios
 drop cascades to constraint managershistory_manager_id_fkey on table managershistory
@@ -108,9 +108,7 @@ INSERT 0 3
 INSERT 0 3
 INSERT 0 7
 INSERT 0 3
-psql:C:/Users/Ron/Downloads/CSC343-A3/data.sql:66: ERROR:  column "session_engineer_pos" of relation "sessions" does not exist
-LINE 1: INSERT INTO Sessions (session_id, engineer_id, session_engin...
-                                                       ^
+INSERT 0 3
 INSERT 0 2
 INSERT 0 1
 INSERT 0 2
@@ -135,30 +133,22 @@ DROP VIEW
 CREATE VIEW
 psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:31: NOTICE:  view "studiosegments" does not exist, skipping
 DROP VIEW
-psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:37: ERROR:  relation "mysessions" does not exist
-LINE 4: Segment NATURAL JOIN MySessions
-                             ^
+CREATE VIEW
 psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:40: NOTICE:  view "studiotracks" does not exist, skipping
 DROP VIEW
-psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:46: ERROR:  relation "studiosegments" does not exist
-LINE 4: StudioSegments NATURAL JOIN TrackSegmentRelation
-        ^
+CREATE VIEW
 psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:50: NOTICE:  view "studioalbums" does not exist, skipping
 DROP VIEW
-psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:56: ERROR:  relation "studiotracks" does not exist
-LINE 4: StudioTracks NATURAL JOIN Album
-        ^
+CREATE VIEW
 psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:59: NOTICE:  view "answer" does not exist, skipping
 DROP VIEW
-psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:67: ERROR:  relation "studioalbums" does not exist
-LINE 4: StudioAlbums NATURAL JOIN CurrentManagerData
-        ^
-psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:72: ERROR:  relation "answer" does not exist
-LINE 3: FROM Answer
-             ^
- studio_id | current_manager_id | name | albums_contibuted
------------+--------------------+------+-------------------
-(0 rows)
+CREATE VIEW
+INSERT 0 2
+ studio_id | current_manager_id |     name     | albums_contibuted
+-----------+--------------------+--------------+-------------------
+         1 |               1233 | Donna Meagle |                 2
+         3 |               1232 | Leslie Knope |                 2
+(2 rows)
 
 
 postgres-# \echo
@@ -251,7 +241,6 @@ CREATE VIEW
 psql:C:/Users/Ron/Downloads/CSC343-A3/q4.sql:65: NOTICE:  view "uniquealbumplayers" does not exist, skipping
 DROP VIEW
 CREATE VIEW
-psql:C:/Users/Ron/Downloads/CSC343-A3/q4.sql:75: NOTICE:  view "answer" does not exist, skipping
 DROP VIEW
 CREATE VIEW
 INSERT 0 2
