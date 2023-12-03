@@ -41,17 +41,10 @@ CREATE OR REPLACE VIEW AllBandMemberSessions as
 ;
 
 
--- Map all individuals who booked the session.
-CREATE OR REPLACE VIEW BookerSession as
-    SELECT booker_id as person_id, session_id
-    FROM Sessions
-;
-
-
 -- The final query which maps ALL persons to the number of sessions they played
 -- at.
 CREATE OR REPLACE VIEW PersonSessionCount as 
     SELECT person_id, COUNT(DISTINCT session_id)
     FROM 
-    (IndividualSessions UNION AllBandMemberSessions UNION BookerSession)
+    (IndividualSessions UNION AllBandMemberSessions)
 ;

@@ -1,5 +1,5 @@
 -- COULD NOT: The domain required that a track must belong in at least one 
--- album. Italso required that an album must have at least two tracks.
+-- album. It also required that an album must have at least two tracks.
 -- This specifications imply a circular dependency, that require triggers.
 -- We decided to NOT do the former, but still do the latter. This way, the
 -- circular dependency is avoided. It also makes sense as a database designer 
@@ -16,9 +16,6 @@
 --      a. Once a new studio is created, there must also 
 --          be a manager for that studio at the same time.
 --      b. EXACTLY one person books a session.
---      c. The person who booked the session must play in that session.
---      d. If a band wants to book a session, one representative member
---          of the band must book that session.
 DROP TABLE IF EXISTS Person CASCADE;
 
 -- A person named <name> is identified by a unique <person_id>. The table also 
@@ -119,9 +116,8 @@ DROP TABLE IF EXISTS Sessions CASCADE;
 --
 -- It also holds start and end timestamps and fee for the session.
 --
--- A person with ID <booker_id> booked the session, who is ASSUMED to
--- be be playing in that session. If a band books a session, a band member 
--- is ASSUMED to have booked that session. 
+-- The person who booked the session may or may NOT play in the 
+-- session.
 --
 -- A session MUST also have an engineer with ID of <engineer_id>.
 CREATE TABLE Sessions (
