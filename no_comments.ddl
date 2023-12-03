@@ -1,4 +1,20 @@
+-- Domains
+
+DROP DOMAIN IF EXISTS positiveFloat CASCADE;
+
+CREATE DOMAIN positiveFloat AS real
+    DEFAULT NULL
+    CHECK (VALUE > 0.0);
+
+DROP DOMAIN IF EXISTS positiveInt CASCADE;
+
+CREATE DOMAIN positiveInt AS smallint
+    DEFAULT NULL
+    CHECK (VALUE > 0);
+
 DROP TABLE IF EXISTS Person CASCADE;
+
+-- Relations
 
 CREATE TABLE Person (
     person_id BIGSERIAL PRIMARY KEY,
@@ -29,14 +45,14 @@ CREATE TABLE BandMembership (
 DROP TABLE IF EXISTS Certificates CASCADE;
 
 CREATE TABLE Certificates (
-    certificate_id SERIAL PRIMARY KEY
+    certificate_id VARCHAR(64) PRIMARY KEY
 );
 
 DROP TABLE IF EXISTS Engineer CASCADE;
 
 CREATE TABLE Engineer (
     engineer_id BIGSERIAL NOT NULL PRIMARY KEY,
-    main_certificate INT NOT NULL,
+    main_certificate VARCHAR(64),
     FOREIGN KEY (engineer_id) REFERENCES Person(person_id),
     FOREIGN KEY (main_certificate) REFERENCES Certificates(certificate_id)
 );
@@ -45,7 +61,7 @@ DROP TABLE IF EXISTS EngineersCertification CASCADE;
 
 CREATE TABLE EngineersCertification (
     engineer_id BIGINT NOT NULL,
-    certificate_id INT NOT NULL,
+    certificate_id  VARCHAR(64) NOT NULL,
     FOREIGN KEY (engineer_id) REFERENCES Engineer(engineer_id),
     FOREIGN KEY (certificate_id) REFERENCES Certificates(certificate_id),
     PRIMARY KEY(engineer_id, certificate_id)
@@ -72,9 +88,9 @@ CREATE TABLE ManagersHistory (
     PRIMARY KEY (studio_id, manager_id, employment_start_date)
 );
 
-DROP TABLE IF EXISTS Sessions CASCADE;
+DROP TABLE IF EXISTS MySessions CASCADE;
 
-CREATE TABLE Sessions (
+CREATE TABLE MySessions (
     session_id BIGSERIAL PRIMARY KEY,
     studio_id BIGINT,
     start_datetime TIMESTAMP,
@@ -95,7 +111,7 @@ CREATE TABLE ExtraEngineersPerSession (
     engineer_id INT NOT NULL,
     session_engineer_pax SERIAL,
     FOREIGN KEY (engineer_id) REFERENCES Engineer(engineer_id),
-    FOREIGN KEY (session_id) REFERENCES Sessions(session_id),
+    FOREIGN KEY (session_id) REFERENCES MySessions(session_id),
     PRIMARY KEY (session_id, engineer_id),
     CONSTRAINT at_most_three CHECK (session_engineer_pax >= 1 and
     session_engineer_pax <= 2),
@@ -108,7 +124,7 @@ CREATE TABLE SessionPerson (
     session_id BIGINT,
     player_id INT,
     FOREIGN KEY (player_id) REFERENCES Person(person_id),
-    FOREIGN KEY (session_id) REFERENCES Sessions(session_id),
+    FOREIGN KEY (session_id) REFERENCES MySessions(session_id),
     PRIMARY KEY(session_id, player_id)
 );
 
@@ -117,7 +133,7 @@ DROP TABLE IF EXISTS SessionBands CASCADE;
 CREATE TABLE SessionBands (
     session_id BIGINT,
     band_id INT,
-    FOREIGN KEY (session_id) REFERENCES Sessions(session_id),
+    FOREIGN KEY (session_id) REFERENCES MySessions(session_id),
     FOREIGN KEY (band_id) REFERENCES Band(band_id),
     PRIMARY KEY(session_id, band_id)
 );
@@ -136,7 +152,7 @@ CREATE TABLE Segment (
     session_id INT NOT NULL,
     length positiveInt,
     format VARCHAR(80),
-    FOREIGN KEY (session_id) REFERENCES Sessions(session_id)
+    FOREIGN KEY (session_id) REFERENCES MySessions(session_id)
 );
 
 DROP TABLE IF EXISTS TrackSegmentRelation CASCADE;
@@ -171,18 +187,3 @@ CREATE TABLE TrackAlbumRelation (
     FOREIGN KEY (album_id) REFERENCES Album(album_id),
     FOREIGN KEY (track_id) REFERENCES Track(track_id)
 );
-
-
--- Domains
-
-DROP DOMAIN IF EXISTS positiveFloat CASCADE;
-
-CREATE DOMAIN positiveFloat AS real
-    DEFAULT NULL
-    CHECK (VALUE > 0.0);
-
-DROP DOMAIN IF EXISTS positiveInt CASCADE;
-
-CREATE DOMAIN positiveInt AS smallint
-    DEFAULT NULL
-    CHECK (VALUE > 0);
