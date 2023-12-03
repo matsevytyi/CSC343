@@ -28,8 +28,7 @@ INSERT INTO Certificates (certificate_id) VALUES
 -- Inserting data into Engineer table
 INSERT INTO Engineer (engineer_id, main_certificate) VALUES
   (5678, 'ABCDEFGH-123I'),
-  (9942, 'SOUND-123-AUDIO'),
-  (6521, NULL);
+  (9942, 'SOUND-123-AUDIO');
 
 -- Inserting data into EngineersCertification table
 INSERT INTO EngineersCertification (engineer_id, certificate_id) VALUES
@@ -59,12 +58,6 @@ VALUES
   (1, '2023-01-10 13:00', '2023-01-11 14:00', 1500, 5678, 6754),
   (1, '2023-01-12 18:00', '2023-01-13 20:00', 1500, 5678, 6754);
 
-INSERT INTO Sessions (session_id, engineer_id, session_engineer_pos)
-VALUES
-  (1, 9942, 1),
-  (2, 9942, 1),
-  (3, 9942, 1);
-
 -- Second set of sessions
 INSERT INTO Sessions (studio_id, start_datetime, end_datetime, fee, engineer_id, booker_id)
 VALUES
@@ -74,7 +67,7 @@ VALUES
 -- Third set of sessions
 INSERT INTO Sessions (studio_id, start_datetime, end_datetime, fee, engineer_id, booker_id)
 VALUES
-  (1, '2023-03-13 10:00', '2023-03-13 20:00', 1000, 6521, 6754);
+  (1, '2023-03-13 10:00', '2023-03-13 20:00', 1000, 9942, 6754);
 
 -- Fourth set of sessions
 INSERT INTO Sessions (studio_id, start_datetime, end_datetime, fee, engineer_id, booker_id)

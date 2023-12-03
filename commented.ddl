@@ -16,6 +16,22 @@
 --      a. Once a new studio is created, there must also 
 --          be a manager for that studio at the same time.
 --      b. EXACTLY one person books a session.
+
+
+-- Domains
+
+DROP DOMAIN IF EXISTS positiveFloat CASCADE;
+
+CREATE DOMAIN positiveFloat AS real
+    DEFAULT NULL
+    CHECK (VALUE > 0.0);
+
+DROP DOMAIN IF EXISTS positiveInt CASCADE;
+
+CREATE DOMAIN positiveInt AS smallint
+    DEFAULT NULL
+    CHECK (VALUE > 0);
+    
 DROP TABLE IF EXISTS Person CASCADE;
 
 -- A person named <name> is identified by a unique <person_id>. The table also 
@@ -55,7 +71,7 @@ DROP TABLE IF EXISTS Certificates CASCADE;
 
 -- A valid certificate is uniquely identified by some <certificate_id>.
 CREATE TABLE Certificates (
-    certificate_id SERIAL PRIMARY KEY
+    certificate_id VARCHAR(80) PRIMARY KEY
 );
 
 DROP TABLE IF EXISTS Engineer CASCADE;
@@ -65,7 +81,7 @@ DROP TABLE IF EXISTS Engineer CASCADE;
 -- their Engineering Certification.
 CREATE TABLE Engineer (
     engineer_id BIGSERIAL NOT NULL PRIMARY KEY,
-    main_certificate INT NOT NULL,
+    main_certificate VARCHAR(80),
     FOREIGN KEY (engineer_id) REFERENCES Person(person_id),
     FOREIGN KEY (main_certificate) REFERENCES Certificates(certificate_id)
 );
@@ -75,7 +91,7 @@ DROP TABLE IF EXISTS EngineersCertification CASCADE;
 -- Engineer <engineer_id> has any additional certificates <certificate_id>.
 CREATE TABLE EngineersCertification (
     engineer_id BIGINT NOT NULL,
-    certificate_id INT NOT NULL,
+    certificate_id VARCHAR(80) NOT NULL,
     FOREIGN KEY (engineer_id) REFERENCES Engineer(engineer_id),
     FOREIGN KEY (certificate_id) REFERENCES Certificates(certificate_id),
     PRIMARY KEY(engineer_id, certificate_id)
@@ -242,16 +258,3 @@ CREATE TABLE TrackAlbumRelation (
 );
 
 
--- Domains
-
-DROP DOMAIN IF EXISTS positiveFloat CASCADE;
-
-CREATE DOMAIN positiveFloat AS real
-    DEFAULT NULL
-    CHECK (VALUE > 0.0);
-
-DROP DOMAIN IF EXISTS positiveInt CASCADE;
-
-CREATE DOMAIN positiveInt AS smallint
-    DEFAULT NULL
-    CHECK (VALUE > 0);
