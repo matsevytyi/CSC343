@@ -33,7 +33,7 @@ DROP VIEW IF EXISTS StudioSegments CASCADE;
 CREATE VIEW StudioSegments AS
 SELECT segment_id, studio_id
 FROM
-Segment NATURAL JOIN MySessions
+Segment NATURAL JOIN Sessions
 ;
 
 --all recording tracks of each studio
@@ -72,3 +72,5 @@ INSERT INTO Q1
 SELECT *
 FROM Answer
 ;
+
+select * from q1;

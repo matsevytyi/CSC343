@@ -1,4 +1,4 @@
-postgres-# \echo -------------------- Loading schema and data: -------------------- 
+postgres-# \echo -------------------- Loading schema and data: --------------------
 -------------------- Loading schema and data: --------------------
 postgres-# \echo
 
@@ -22,7 +22,7 @@ DROP DOMAIN
 CREATE DOMAIN
 psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:35: NOTICE:  drop cascades to 10 other objects
 DETAIL:  drop cascades to constraint band_frontman_id_fkey on table band
-drop cascades to constraint bandmembership_member_id_fkey on table bandmembership
+drop cascades to constraint bandmembership_member_id_fkey on table bandmembership   
 drop cascades to constraint engineer_engineer_id_fkey on table engineer
 drop cascades to constraint studios_og_manager_id_fkey on table studios
 drop cascades to constraint managershistory_manager_id_fkey on table managershistory
@@ -65,11 +65,14 @@ DROP TABLE
 CREATE TABLE
 DROP TABLE
 CREATE TABLE
-psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:128: NOTICE:  drop cascades to 4 other objects
+psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:128: NOTICE:  drop cascades to 7 other objects
 DETAIL:  drop cascades to constraint extraengineerspersession_session_id_fkey on table extraengineerspersession
 drop cascades to constraint sessionperson_session_id_fkey on table sessionperson
 drop cascades to constraint sessionbands_session_id_fkey on table sessionbands
 drop cascades to constraint segment_session_id_fkey on table segment
+drop cascades to view studiosegments
+drop cascades to view studiotracks
+drop cascades to view studioalbums
 DROP TABLE
 CREATE TABLE
 DROP TABLE
@@ -140,15 +143,16 @@ CREATE VIEW
 psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:50: NOTICE:  view "studioalbums" does not exist, skipping
 DROP VIEW
 CREATE VIEW
-psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:59: NOTICE:  view "answer" does not exist, skipping
+psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:60: NOTICE:  view "answer" does not exist, skipping
 DROP VIEW
 CREATE VIEW
-INSERT 0 2
+INSERT 0 3
  studio_id | current_manager_id |     name     | albums_contibuted
 -----------+--------------------+--------------+-------------------
-         1 |               1233 | Donna Meagle |                 2
-         3 |               1232 | Leslie Knope |                 2
-(2 rows)
+         1 |               1233 | Donna Meagle |                 1
+         2 |               1233 | Donna Meagle |                 0
+         3 |               1232 | Leslie Knope |                 1
+(3 rows)
 
 
 postgres-# \echo
@@ -249,4 +253,3 @@ INSERT 0 2
         1 | The Awesome Album     |                      5 |                  6
         2 | Another Awesome Album |                      5 |                  1
 (2 rows)
-
