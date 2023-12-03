@@ -31,10 +31,10 @@ WHERE rnk = 1
 DROP VIEW IF EXISTS StudioSegments CASCADE;
 
 CREATE VIEW StudioSegments AS
-SELECT s.segment_id, s2.studio_id
-FROM Segment s
-JOIN Sessions s2
-ON s.session_id = s2.session_id;
+SELECT segment_id, studio_id
+FROM
+Segment NATURAL JOIN MySessions
+;
 
 --all recording tracks of each studio
 DROP VIEW IF EXISTS StudioTracks CASCADE;
@@ -52,23 +52,23 @@ DROP VIEW IF EXISTS StudioAlbums CASCADE;
 CREATE VIEW StudioAlbums AS
 SELECT DISTINCT album_id, studio_id
 FROM
-StudioTracks NATURAL JOIN Album
+StudioTracks RIGHT JOIN TrackAlbumRelation
+ON StudioTracks.track_id = TrackAlbumRelation.track_id
 ;
 
 --answer
 DROP VIEW IF EXISTS Answer CASCADE;
 
 CREATE VIEW Answer AS
-SELECT studio_id, current_manager_id, name, count(album_id) as albums_contibuted
+SELECT CMD.studio_id, CMD.current_manager_id, CMD.name, count(SA.album_id) as albums_contibuted
 FROM
-StudioAlbums NATURAL JOIN CurrentManagerData
-GROUP BY studio_id, current_manager_id, name
-ORDER BY studio_id
+StudioAlbums SA RIGHT JOIN CurrentManagerData CMD
+ON SA.studio_id = CMD.studio_id
+GROUP BY CMD.studio_id, CMD.current_manager_id, CMD.name
+ORDER BY CMD.studio_id
 ;
 
 INSERT INTO Q1
 SELECT *
 FROM Answer
 ;
-
-SELECT * FROM Q1;
