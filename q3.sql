@@ -80,3 +80,6 @@ CREATE OR REPLACE VIEW peopleInLongestSessionDetails AS (
 INSERT INTO Q3
 SELECT *
 FROM peopleInLongestSessionDetails;
+
+
+SELECT * FROM Q3;

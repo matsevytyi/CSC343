@@ -1,99 +1,179 @@
--- I think to avoid using triggers as per @664 & @742, it is best if we stick
-with og_manager_id. Then, if we want to hire a new manager for a studio, it is
-enough that we add them to ManagersHistory table.
+-- COULD NOT: The domain required that a track must belong in at least one 
+-- album. It also required that an album must have at least two tracks.
+-- This specifications imply a circular dependency, that require triggers.
+-- We decided to NOT do the former, but still do the latter. This way, the
+-- circular dependency is avoided. It also makes sense as a database designer 
+-- since some tracks can be released independent (i.e. as a single) from an 
+-- album. Moreover, it does not make sense for an album to get released 
+-- with no tracks in it. 
+
+-- DID NOT: None.
+
+-- EXTRA CONSTRAINTS: None.
+
+-- ASSUMPTIONS:
+-- Here are a list of assumptions in the database design:
+--      a. Once a new studio is created, there must also 
+--          be a manager for that studio at the same time.
+--      b. EXACTLY one person books a session.
+
+
+-- Domains
+
+DROP DOMAIN IF EXISTS positiveFloat CASCADE;
+
+CREATE DOMAIN positiveFloat AS real
+    DEFAULT NULL
+    CHECK (VALUE > 0.0);
+
+DROP DOMAIN IF EXISTS positiveInt CASCADE;
+
+CREATE DOMAIN positiveInt AS smallint
+    DEFAULT NULL
+    CHECK (VALUE > 0);
+    
+DROP TABLE IF EXISTS Person CASCADE;
+
+-- A person named <name> is identified by a unique <person_id>. The table also 
+-- holds other information like email and phone number.
+CREATE TABLE Person (
+    person_id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(255),
+    email VARCHAR(255),
+    phone_number CHAR(12) CHECK (phone_number LIKE '___-___-____')
+);
+
+DROP TABLE IF EXISTS Band CASCADE;
+
+-- A band is uniquely identified by <band_id>, and was started by
+-- <frontman_id> who is ASSUMED to be a band member. Typically they are 
+-- the lead vocalists.
+CREATE TABLE Band (
+    band_id BIGSERIAL PRIMARY KEY,
+    frontman_id INT NOT NULL,
+    FOREIGN KEY (frontman_id) REFERENCES Person(person_id),
+    name VARCHAR(255)
+);
+
+DROP TABLE IF EXISTS BandMembership CASCADE;
+
+-- <member_id> is part of the band <band_id>. Note that this table 
+-- does not include the original founder of the band.
+CREATE TABLE BandMembership (
+    band_id BIGINT NOT NULL,
+    member_id INT NOT NULL,
+    FOREIGN KEY (member_id) REFERENCES Person(person_id),
+    FOREIGN KEY (band_id) REFERENCES Band(band_id),
+    PRIMARY KEY(band_id, member_id)
+);
+
+DROP TABLE IF EXISTS Certificates CASCADE;
+
+-- A valid certificate is uniquely identified by some <certificate_id>.
+CREATE TABLE Certificates (
+    certificate_id VARCHAR(80) PRIMARY KEY
+);
+
+DROP TABLE IF EXISTS Engineer CASCADE;
+
+-- The engineers in the database. An engineer must have at least one 
+-- certificate, identified by <main_certificate>. Typically, this is 
+-- their Engineering Certification.
+CREATE TABLE Engineer (
+    engineer_id BIGSERIAL NOT NULL PRIMARY KEY,
+    main_certificate VARCHAR(80),
+    FOREIGN KEY (engineer_id) REFERENCES Person(person_id),
+    FOREIGN KEY (main_certificate) REFERENCES Certificates(certificate_id)
+);
+
+DROP TABLE IF EXISTS EngineersCertification CASCADE;
+
+-- Engineer <engineer_id> has any additional certificates <certificate_id>.
+CREATE TABLE EngineersCertification (
+    engineer_id BIGINT NOT NULL,
+    certificate_id VARCHAR(80) NOT NULL,
+    FOREIGN KEY (engineer_id) REFERENCES Engineer(engineer_id),
+    FOREIGN KEY (certificate_id) REFERENCES Certificates(certificate_id),
+    PRIMARY KEY(engineer_id, certificate_id)
+);
+
+DROP TABLE IF EXISTS Studios CASCADE;
+
+-- All the studios the company owns. It contains necessary info like
+--<studio_id>, <studio_name> and <address>. A new studio MUST have exactly one
+-- original manager, with an ID of <og_manager_id>.
 CREATE TABLE Studios (
-    studio_id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    studio_id BIGSERIAL PRIMARY KEY,
     studio_name VARCHAR(255),
     address VARCHAR(255),
-    og_manager_id INT,
+    og_manager_id INT NOT NULL,
     FOREIGN KEY (og_manager_id) REFERENCES Person(person_id)
 );
 
+DROP TABLE IF EXISTS ManagersHistory CASCADE;
 
--- Holds any additonal managers for a studio. 
--- NOTE: The the employment_start_date in the primary key ensures that an manager can be rehired to be a manager
-again at a later time. We assume that for some studio A, the start_date of any
-new managers is AFTER the start date of studio A's og_manager (that is defined
-in Studio), which we do not need to define.
--- Since the manager_id is not unique, we allow a manager to manage multiple
-studios at the same time,
+-- all OTHER managers with some <manager_id>, managing some studio <studio_id>,
+-- who started working on <employment_start_date>.
+--
+-- Note that the original manager for a studio is not in this relation.
 CREATE TABLE ManagersHistory (
     manager_id INT NOT NULL,
     studio_id BIGINT NOT NULL,
     employment_start_date DATE DEFAULT CURRENT_DATE,
-    FOREIGN KEY (managerID) REFERENCES Person(person_id),
+    FOREIGN KEY (manager_id) REFERENCES Person(person_id),
     FOREIGN KEY (studio_id) REFERENCES Studios(studio_id),
-    PRIMARY KEY (studio_id, manager_id, employment_start_date),
+    PRIMARY KEY (studio_id, manager_id, employment_start_date)
 );
 
+DROP TABLE IF EXISTS Sessions CASCADE;
 
--- FOR ENGINEER CONSTRAINT: So what I'm saying is if we create a session, it
-must have an engineer that must be in CertificatedEngineers table. But, if that
-person is in CertificatedEngineers table, they must already have at least one
-certificate. 
-
--- Looking at the ExtraEngineersPerSession Table, that contains any additional
-engineers we have for a session (GO TO THAT TABLE).
-
--- Now consider our constraint where at least one person must play in a session.
-Previously, we said that either a band or a person can book a session. But this
-implies that our player_id is a foreign key to 2 tables (impossible).
--- With current implementation, we ASSUME that only one person can book a
-session. We also ASSUME that the person who booked the session is gonna play in
-the session. If a band wants to book a session, we ASSUME that the person
-booking is part of the band (and will play in that session). If a band wants to
-book, they must be explicitly added to SessionBands table. If it is an
-individual, they must be added to SessionPerson.
+-- A recording session uniquely identified with <session_id> that 
+-- occured at some studio with ID <studio_id>. 
+--
+-- It also holds start and end timestamps and fee for the session.
+--
+-- The person who booked the session may or may NOT play in the 
+-- session.
+--
+-- A session MUST also have an engineer with ID of <engineer_id>.
 CREATE TABLE Sessions (
-    session_id BIGINT IDENTITY(1,1) PRIMARY KEY,
+    session_id BIGSERIAL PRIMARY KEY,
     studio_id BIGINT,
-    start_datetime DATETIME,
-    end_datetime DATETIME,
+    start_datetime TIMESTAMP,
+    end_datetime TIMESTAMP,
     fee positiveFloat,
     engineer_id INT NOT NULL,
     booker_id INT NOT NULL,
     FOREIGN KEY (studio_id) REFERENCES Studios(studio_id),
-    FOREIGN KEY (engineer_id) REFERENCES CertificatedEngineers(engineer_id),
+    FOREIGN KEY (engineer_id) REFERENCES Engineer(engineer_id),
     FOREIGN KEY (booker_id) REFERENCES Person(person_id),
-    CONSTRAINT no_overlapping_sessions
-        CHECK (NOT EXISTS (
-            SELECT 1
-            FROM Sessions s1, Sessions s2
-            WHERE s1.session_id <> s2.session_id
-              AND s1.studio_id = s2.studio_id
-              AND s1.start_datetime = s2.start_datetime
-        ))
+    UNIQUE (session_id, start_datetime)
 );
 
+DROP TABLE IF EXISTS ExtraEngineersPerSession CASCADE;
 
--- This is where we should check if a session has <= 3 engineers.
---session_engineer_pax identifies the i-th engineer for a session. Note that it
-is at most 2 (since the 1st engineer is in Sessions). Note the unique
-constraint. It ensures that no two engineers are marked as the ith engineer.
+-- The extra engineers for some session. It holds the session's ID <session_id> 
+-- and the <session_engineer_pos>-th engineer's ID with <engineer_id>.
+--
+-- Note that <session_engineer_pos> is either 2 or 3 to represent 
+-- the 2nd and/or 3rd engineer, if necessary. The 1st engineer for a 
+-- session <session_id> was defined when the session was created.
 CREATE TABLE ExtraEngineersPerSession (
     session_id BIGINT,
     engineer_id INT NOT NULL,
-    session_engineer_pax smallint IDENTITY(1,1),
-    FOREIGN KEY (engineer_id) REFERENCES CertificatedEngineers(engineer_id),
+    session_engineer_pos SERIAL,
+    FOREIGN KEY (engineer_id) REFERENCES Engineer(engineer_id),
     FOREIGN KEY (session_id) REFERENCES Sessions(session_id),
     PRIMARY KEY (session_id, engineer_id),
-    CONSTRAINT at_most_three CHECK (session_engineer_pax >= 1 and
-    session_engineer_pax <= 2);
-    UNIQUE (session_id, engineer_id, session_engineer_pax)
+    CONSTRAINT at_most_three CHECK (session_engineer_pos >= 2 and
+    session_engineer_pos <= 3),
+    UNIQUE (session_id, engineer_id, session_engineer_pos)
 );
 
+DROP TABLE IF EXISTS SessionPerson CASCADE;
 
--- This relation is valid since the primary key is eng_id, certificate_id. No
-redundancy there.
-CREATE TABLE CertificatedEngineers (
-    engineer_id INT NOT NULL,
-    certificate_id INT NOT NULL,
-    FOREIGN KEY (engineer_id) REFERENCES Person(person_id),
-    PRIMARY KEY(engineer_id, certificate_id)
-);
-
--- Holds any individuals that will play in a session. NOTE: This is in addition
-to the individual already defined in Sessions table.
+-- The individual persons with ID <player_id> playing in the session 
+-- <session_id>.
 CREATE TABLE SessionPerson (
     session_id BIGINT,
     player_id INT,
@@ -102,44 +182,45 @@ CREATE TABLE SessionPerson (
     PRIMARY KEY(session_id, player_id)
 );
 
--- Holds any bands that will play in a session.
+DROP TABLE IF EXISTS SessionBands CASCADE;
+
+-- The bands playing with id <band_id> playing in the session 
+-- <session_id>
 CREATE TABLE SessionBands (
     session_id BIGINT,
     band_id INT,
-    FOREIGN KEY (engineer_id) REFERENCES Person(person_id),
     FOREIGN KEY (session_id) REFERENCES Sessions(session_id),
-    PRIMARY KEY(session_id, player_id)
+    FOREIGN KEY (band_id) REFERENCES Band(band_id),
+    PRIMARY KEY(session_id, band_id)
 );
 
+DROP TABLE IF EXISTS Track CASCADE;
 
-CREATE TABLE Person (
-    person_id INT IDENTITY(1, 1) PRIMARY KEY,
-    name VARCHAR(255),
-    email VARCHAR(255),
-    phone_number CHAR(12) CHECK (phone_number LIKE '___-___-____')
+-- Track table holds all the music tracks. A track is named <name> which are 
+-- uniquely identified by <track_id>. When a track is initally released, it 
+-- is considered a single release so the track need not to belong in some 
+-- album.
+CREATE TABLE Track (
+    track_id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(80)
 );
 
-CREATE TABLE Band (
-    band_id INT IDENTITY(1, 1),
-    name VARCHAR(255),
-    member_id NOT NULL INT,
-    FOREIGN KEY (member_id) REFERENCES Person(person_id),
-    PRIMARY KEY(band_id, member_id)
-);
+DROP TABLE IF EXISTS Segment CASCADE;
 
-
--- These are the segments associated to each session. 
--- NOTE: session_id is NOT NULL to ensure a segment is associated to EXACTLY one session.
+-- A segment of sound recording with ID <segment_id> from the session 
+-- <session_id> that is <length> seconds long with a <format> type format.
 CREATE TABLE Segment (
-    segment_id INT IDENTITY(1,1) PRIMARY KEY,
+    segment_id BIGSERIAL PRIMARY KEY,
     session_id INT NOT NULL,
     length positiveInt,
     format VARCHAR(80),
     FOREIGN KEY (session_id) REFERENCES Sessions(session_id)
 );
 
+DROP TABLE IF EXISTS TrackSegmentRelation CASCADE;
 
--- Creates a relationship between tracks and recording segments.
+-- A track <track_id> is composed of zero, one or multiple segments
+-- of recording identified by <segment_id>.  
 CREATE TABLE TrackSegmentRelation (
     track_id INT,
     segment_id INT, 
@@ -148,84 +229,32 @@ CREATE TABLE TrackSegmentRelation (
     PRIMARY KEY(track_id, segment_id)
 );
 
+DROP TABLE IF EXISTS Album CASCADE;
 
--- Holds information about a track.
--- NOTE: In this implementation, we will NOT uphold the constraint "a track MUST
-appear in at least one album". This is to avoid awkward circular FK as per @748.
-This also makes sense in real life since some tracks are released as a single,
-with the option to add that single to an album later on.
-CREATE TABLE Track (
-    track_id INT IDENTITY(1,1) PRIMARY KEY,
-    name VARCHAR(80)
-);
-
--- Holds information about the album.
--- NOTE: We must specify two preexisting DISTINCT tracks that must be added to the album
-we just created.
+-- The album <album_id> is originally composed of two tracks: <first_og_track>, 
+-- <second_og_track>. The album is named <name> and will release on 
+-- <release_date>.
 CREATE TABLE Album (
-    album_id INT IDENTITY(1,1) PRIMARY KEY,
+    album_id BIGSERIAL PRIMARY KEY,
     name VARCHAR(80),
     release_date DATE,
-    og_track1 INT NOT NULL,
-    og_track2 INT NOT NULL,
-    FOREIGN KEY (og_track1) REFERENCES Track(track_id),
-    FOREIGN KEY (og_track2) REFERENCES Track(track_id),
-    CONSTRAINT CheckDistinctTracks CHECK (og_track1 <> og_track2)
+    first_og_track INT NOT NULL,
+    second_og_track INT NOT NULL,
+    FOREIGN KEY (first_og_track) REFERENCES Track(track_id),
+    FOREIGN KEY (second_og_track) REFERENCES Track(track_id),
+    CONSTRAINT CheckDistinctTracks CHECK (first_og_track <> second_og_track)
 );
 
+DROP TABLE IF EXISTS TrackAlbumRelation CASCADE;
 
-
--- This holds any additional tracks we want to add to an album.
+-- Any additional tracks identified <track_id> that belongs to some 
+-- album <album_id>.
 CREATE TABLE TrackAlbumRelation (
-    album_id INT,
-    track_id INT,
+    album_id INT NOT NULL,
+    track_id INT NOT NULL,
     PRIMARY KEY (album_id, track_id),
     FOREIGN KEY (album_id) REFERENCES Album(album_id),
     FOREIGN KEY (track_id) REFERENCES Track(track_id)
-
 );
 
 
-
--- Domains
-
-CREATE DOMAIN positiveFloat AS real
-    DEFAULT NULL
-    CHECK (VALUE > 0.0);
-
-CREATE DOMAIN positiveInt AS smallint
-    DEFAULT NULL
-    CHECK (VALUE > 0);
-
--- A trigger that inserts the og_track1, og_track2 into the Album.
-CREATE OR REPLACE FUNCTION add_tracks_to_album() 
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO TrackAlbum (album_id, track_id) 
-  VALUES (NEW.album_id, NEW.og_track1), (NEW.album_id, NEW.og_track2);
-  
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER add_tracks_after_album_creation
-AFTER INSERT ON Album 
-FOR EACH ROW EXECUTE PROCEDURE add_tracks_to_album();
-
-
--- A trigger to ensure that if every album has at least two tracks associated
-with it.
-CREATE OR REPLACE FUNCTION check_album_tracks()
-RETURNS TRIGGER AS $$
-BEGIN
-  IF (SELECT COUNT(*) FROM TrackAlbum WHERE album_id = NEW.album_id) < 2 THEN
-    RAISE EXCEPTION 'An Album Must Have At Least Two Tracks';
-  END IF;
-  
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER enforce_track_count 
-AFTER INSERT OR DELETE ON TrackAlbum 
-FOR EACH ROW EXECUTE PROCEDURE check_album_tracks();

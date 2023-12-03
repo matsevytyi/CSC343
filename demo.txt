@@ -1,0 +1,263 @@
+postgres-# \echo -------------------- Loading schema and data: -------------------- 
+-------------------- Loading schema and data: --------------------
+postgres-# \echo
+
+postgres-# \i C:/Users/Ron/Downloads/CSC343-A3/schema.ddl
+psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:23: NOTICE:  drop cascades to column fee of table sessions
+DROP DOMAIN
+CREATE DOMAIN
+psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:29: NOTICE:  drop cascades to 11 other objects
+DETAIL:  drop cascades to column length of table segment
+drop cascades to view sessionsegmentlength
+drop cascades to view sessionwithmaxtotallength
+drop cascades to view individualsforlongestsession
+drop cascades to view bandsforlongestsession
+drop cascades to view frontmenforlongestsession
+drop cascades to view otherbandmembersforlongestsession
+drop cascades to view peopleinlongestsessiondetails
+drop cascades to view uniquetrackplayers
+drop cascades to view uniquealbumplayers
+drop cascades to view answer
+DROP DOMAIN
+CREATE DOMAIN
+psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:35: NOTICE:  drop cascades to 10 other objects
+DETAIL:  drop cascades to constraint band_frontman_id_fkey on table band
+drop cascades to constraint bandmembership_member_id_fkey on table bandmembership   
+drop cascades to constraint engineer_engineer_id_fkey on table engineer
+drop cascades to constraint studios_og_manager_id_fkey on table studios
+drop cascades to constraint managershistory_manager_id_fkey on table managershistory
+drop cascades to constraint sessions_booker_id_fkey on table sessions
+drop cascades to constraint sessionperson_player_id_fkey on table sessionperson     
+drop cascades to view currentmanagerdata
+drop cascades to view individualsessions
+drop cascades to view personsessioncount
+DROP TABLE
+CREATE TABLE
+psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:46: NOTICE:  drop cascades to 4 other objects
+DETAIL:  drop cascades to constraint bandmembership_band_id_fkey on table bandmembership
+drop cascades to constraint sessionbands_band_id_fkey on table sessionbands
+drop cascades to view frontmansessions
+drop cascades to view allbandmembersessions
+DROP TABLE
+CREATE TABLE
+psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:58: NOTICE:  drop cascades to 2 other objects
+DETAIL:  drop cascades to view otherbandmembersessions
+drop cascades to view bandsessionplayers
+DROP TABLE
+CREATE TABLE
+psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:70: NOTICE:  drop cascades to 2 other objects
+DETAIL:  drop cascades to constraint engineer_main_certificate_fkey on table engineer
+drop cascades to constraint engineerscertification_certificate_id_fkey on table engineerscertification
+DROP TABLE
+CREATE TABLE
+psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:77: NOTICE:  drop cascades to 3 other objects
+DETAIL:  drop cascades to constraint engineerscertification_engineer_id_fkey on table engineerscertification
+drop cascades to constraint sessions_engineer_id_fkey on table sessions
+drop cascades to constraint extraengineerspersession_engineer_id_fkey on table extraengineerspersession
+DROP TABLE
+CREATE TABLE
+DROP TABLE
+CREATE TABLE
+psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:100: NOTICE:  drop cascades to 2 other objects
+DETAIL:  drop cascades to constraint managershistory_studio_id_fkey on table managershistory
+drop cascades to constraint sessions_studio_id_fkey on table sessions
+DROP TABLE
+CREATE TABLE
+DROP TABLE
+CREATE TABLE
+psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:128: NOTICE:  drop cascades to 4 other objects
+DETAIL:  drop cascades to constraint extraengineerspersession_session_id_fkey on table extraengineerspersession
+drop cascades to constraint sessionperson_session_id_fkey on table sessionperson
+drop cascades to constraint sessionbands_session_id_fkey on table sessionbands
+drop cascades to constraint segment_session_id_fkey on table segment
+DROP TABLE
+CREATE TABLE
+DROP TABLE
+CREATE TABLE
+DROP TABLE
+CREATE TABLE
+DROP TABLE
+CREATE TABLE
+psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:197: NOTICE:  drop cascades to 4 other objects
+DETAIL:  drop cascades to constraint tracksegmentrelation_track_id_fkey on table tracksegmentrelation
+drop cascades to constraint album_first_og_track_fkey on table album
+drop cascades to constraint album_second_og_track_fkey on table album
+drop cascades to constraint trackalbumrelation_track_id_fkey on table trackalbumrelation
+DROP TABLE
+CREATE TABLE
+psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:208: NOTICE:  drop cascades to 3 other objects
+DETAIL:  drop cascades to constraint tracksegmentrelation_segment_id_fkey on table tracksegmentrelation
+drop cascades to view uniquetracksessions
+drop cascades to view uniquealbumsessions
+DROP TABLE
+CREATE TABLE
+DROP TABLE
+CREATE TABLE
+psql:C:/Users/Ron/Downloads/CSC343-A3/schema.ddl:232: NOTICE:  drop cascades to constraint trackalbumrelation_album_id_fkey on table trackalbumrelation
+DROP TABLE
+CREATE TABLE
+DROP TABLE
+CREATE TABLE
+postgres-# \i C:/Users/Ron/Downloads/CSC343-A3/data.sql
+INSERT 0 12
+INSERT 0 1
+INSERT 0 4
+INSERT 0 3
+INSERT 0 3
+INSERT 0 3
+INSERT 0 3
+INSERT 0 7
+INSERT 0 3
+psql:C:/Users/Ron/Downloads/CSC343-A3/data.sql:66: ERROR:  column "session_engineer_pos" of relation "sessions" does not exist
+LINE 1: INSERT INTO Sessions (session_id, engineer_id, session_engin...
+                                                       ^
+INSERT 0 2
+INSERT 0 1
+INSERT 0 2
+INSERT 0 7
+INSERT 0 5
+INSERT 0 7
+INSERT 0 41
+INSERT 0 31
+INSERT 0 2
+INSERT 0 7
+postgres-# \echo
+
+postgres-# \echo  -------------------- Query 1: -----------------------------------
+-------------------- Query 1: -----------------------------------
+postgres-# \echo
+
+postgres-# \i C:/Users/Ron/Downloads/CSC343-A3/q1.sql
+DROP TABLE
+CREATE TABLE
+psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:12: NOTICE:  view "currentmanagerdata" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:31: NOTICE:  view "studiosegments" does not exist, skipping
+DROP VIEW
+psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:37: ERROR:  relation "mysessions" does not exist
+LINE 4: Segment NATURAL JOIN MySessions
+                             ^
+psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:40: NOTICE:  view "studiotracks" does not exist, skipping
+DROP VIEW
+psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:46: ERROR:  relation "studiosegments" does not exist
+LINE 4: StudioSegments NATURAL JOIN TrackSegmentRelation
+        ^
+psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:50: NOTICE:  view "studioalbums" does not exist, skipping
+DROP VIEW
+psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:56: ERROR:  relation "studiotracks" does not exist
+LINE 4: StudioTracks NATURAL JOIN Album
+        ^
+psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:59: NOTICE:  view "answer" does not exist, skipping
+DROP VIEW
+psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:67: ERROR:  relation "studioalbums" does not exist
+LINE 4: StudioAlbums NATURAL JOIN CurrentManagerData
+        ^
+psql:C:/Users/Ron/Downloads/CSC343-A3/q1.sql:72: ERROR:  relation "answer" does not exist
+LINE 3: FROM Answer
+             ^
+ studio_id | current_manager_id | name | albums_contibuted
+-----------+--------------------+------+-------------------
+(0 rows)
+
+
+postgres-# \echo
+
+postgres-# \echo  -------------------- Query 2: -----------------------------------
+-------------------- Query 2: -----------------------------------
+postgres-# \echo
+
+postgres-# \i C:/Users/Ron/Downloads/CSC343-A3/q2.sql
+DROP TABLE
+psql:C:/Users/Ron/Downloads/CSC343-A3/q2.sql:4: NOTICE:  view "individualsessions" does not exist, skipping
+psql:C:/Users/Ron/Downloads/CSC343-A3/q2.sql:4: NOTICE:  view "frontmansessions" does not exist, skipping
+psql:C:/Users/Ron/Downloads/CSC343-A3/q2.sql:4: NOTICE:  view "otherbandmembersessions" does not exist, skipping
+psql:C:/Users/Ron/Downloads/CSC343-A3/q2.sql:4: NOTICE:  view "allbandmembersessions" does not exist, skipping
+psql:C:/Users/Ron/Downloads/CSC343-A3/q2.sql:4: NOTICE:  view "personsessioncount" does not exist, skipping
+DROP VIEW
+CREATE TABLE
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+INSERT 0 12
+ studio_id | session_count
+-----------+---------------
+      1000 |             3
+      1231 |             0
+      1232 |             0
+      1233 |             0
+      1234 |             1
+      2224 |             5
+      4523 |             5
+      5678 |             0
+      6521 |             0
+      6754 |             8
+      7832 |             5
+      9942 |             0
+(12 rows)
+
+
+postgres-# \echo
+
+postgres-# \echo  -------------------- Query 3: -----------------------------------
+-------------------- Query 3: -----------------------------------
+postgres-# \echo
+
+postgres-# \i C:/Users/Ron/Downloads/CSC343-A3/q3.sql
+DROP TABLE
+psql:C:/Users/Ron/Downloads/CSC343-A3/q3.sql:4: NOTICE:  view "sessionsegmentlength" does not exist, skipping
+psql:C:/Users/Ron/Downloads/CSC343-A3/q3.sql:4: NOTICE:  view "sessionwithmaxtotallength" does not exist, skipping
+psql:C:/Users/Ron/Downloads/CSC343-A3/q3.sql:4: NOTICE:  view "individualsforlongestsession" does not exist, skipping
+psql:C:/Users/Ron/Downloads/CSC343-A3/q3.sql:4: NOTICE:  view "bandmembersforlongestsession" does not exist, skipping
+DROP VIEW
+CREATE TABLE
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+CREATE VIEW
+INSERT 0 1
+ person_id |    name
+-----------+------------
+      6754 | Andy Dwyer
+(1 row)
+
+
+postgres-# \echo
+
+postgres-# \echo  -------------------- Query 4: -----------------------------------
+-------------------- Query 4: -----------------------------------
+postgres-# \echo
+
+postgres-# \i C:/Users/Ron/Downloads/CSC343-A3/q4.sql
+DROP TABLE
+CREATE TABLE
+psql:C:/Users/Ron/Downloads/CSC343-A3/q4.sql:12: NOTICE:  view "uniquetracksessions" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:C:/Users/Ron/Downloads/CSC343-A3/q4.sql:23: NOTICE:  view "uniquealbumsessions" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:C:/Users/Ron/Downloads/CSC343-A3/q4.sql:34: NOTICE:  view "bandsessionplayers" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:C:/Users/Ron/Downloads/CSC343-A3/q4.sql:43: NOTICE:  view "uniquetrackplayers" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:C:/Users/Ron/Downloads/CSC343-A3/q4.sql:65: NOTICE:  view "uniquealbumplayers" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+psql:C:/Users/Ron/Downloads/CSC343-A3/q4.sql:75: NOTICE:  view "answer" does not exist, skipping
+DROP VIEW
+CREATE VIEW
+INSERT 0 2
+ album_id |         name          | record_sessions_number | diff_players_count
+----------+-----------------------+------------------------+--------------------
+        1 | The Awesome Album     |                      5 |                  6
+        2 | Another Awesome Album |                      5 |                  1
+(2 rows)
+

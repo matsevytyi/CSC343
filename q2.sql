@@ -59,3 +59,5 @@ CREATE OR REPLACE VIEW PersonSessionCount AS
 INSERT INTO Q2
 SELECT *
 FROM PersonSessionCount;
+
+SELECT * FROM Q2;
